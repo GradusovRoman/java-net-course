@@ -55,8 +55,8 @@ public class Client {
 
                             fos.write(fm.getData());
                             fos.close();
-                        } else if (receivedFile instanceof DirectoryListInfo) {
-                            DirectoryListInfo dim = (DirectoryListInfo) receivedFile;
+                        } else if (receivedFile instanceof DirectoryInfo) {
+                            DirectoryInfo dim = (DirectoryInfo) receivedFile;
                             LOGGER.debug("Получена информация о расположении файла");
                             LOGGER.info("Файлы в каталоге: ");
                             System.out.println(dim.getFilesAtDirectory().toString());
@@ -79,12 +79,12 @@ public class Client {
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-            LOGGER.info("Теперь вы можете писать команды, соединение прошло успешно");
-            LOGGER.info("Не забудьте авторизоваться. Используйте /help, для просмотра доступных команд");
+            LOGGER.info("Соединение успешно установлено.");
+            LOGGER.info("Не забудьте авторизоваться. Используйте help, для просмотра доступных команд");
             while (true) {
                 try {
                     String msg = reader.readLine();
-                    if (msg.startsWith("/exit")) {
+                    if (msg.startsWith("exit")) {
                         socket.close();
                         break;
                     }

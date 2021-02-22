@@ -1,4 +1,4 @@
-package ru.daniilazarnov.DB;
+package ru.daniilazarnov.storage;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

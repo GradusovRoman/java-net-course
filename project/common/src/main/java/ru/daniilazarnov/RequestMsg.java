@@ -1,36 +1,33 @@
 package ru.daniilazarnov;
 
+
 public class RequestMsg extends AbstractMsg {
 
-    private String cmd;
+    private CommandList command;
     private String filename;
     private String newFileName;
     private String login;
 
-    public RequestMsg(String cmd, String login) {
-        this.cmd = cmd;
+    public RequestMsg(CommandList command, String login) {
+        this.command = command;
         this.login = login;
     }
 
-    public RequestMsg(String cmd, String filename, String login) {
+    public RequestMsg(CommandList command, String filename, String login) {
         this.filename = filename;
-        this.cmd = cmd;
+        this.command = command;
         this.login = login;
     }
 
-    public RequestMsg(String cmd, String filename, String newFileName, String login) {
+    public RequestMsg(CommandList command, String filename, String newFileName, String login) {
         this.filename = filename;
-        this.cmd = cmd;
+        this.command = command;
         this.newFileName = newFileName;
         this.login = login;
     }
 
     public String getFilename() {
         return filename;
-    }
-
-    public String getCmd() {
-        return cmd;
     }
 
     public String getNewFileName() {
@@ -40,5 +37,8 @@ public class RequestMsg extends AbstractMsg {
     public String getLogin() {
         return login;
     }
-}
 
+    public CommandList getCommand() {
+        return command;
+    }
+}

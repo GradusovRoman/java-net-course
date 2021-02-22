@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.log4j.Logger;
-import ru.daniilazarnov.DirectoryListInfo;
+import ru.daniilazarnov.CommandList;
+import ru.daniilazarnov.DirectoryInfo;
 import ru.daniilazarnov.FileMsg;
 import ru.daniilazarnov.RequestMsg;
 
@@ -23,10 +24,11 @@ public class RequestHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof RequestMsg) {
             RequestMsg request = (RequestMsg) msg;
-            String clientCmd = request.getCmd();
+            CommandList command = request.getCommand();
 
-            switch (clientCmd) {
-                case "/download":
+            switch (command) {
+                case DOWNLOAD:
+                    LOGGER.debug("Получена команда DOWNLOAD от клиента");
                     try {
                         if (Files.exists(Paths.get("./project/server_dir/" + request.getLogin() + "/" + request.getFilename()))) {
                             File file = new File("./project/server_dir/" + request.getLogin() + "/" + request.getFilename());
@@ -47,7 +49,7 @@ public class RequestHandler extends ChannelInboundHandlerAdapter {
                                     fm.setData(Arrays.copyOfRange(fm.getData(), 0, readedBytes));
                                 }
                                 ctx.writeAndFlush(fm);
-                                LOGGER.debug("Part: " + (i + 1) + " отправлена");
+                                LOGGER.debug("Часть: " + (i + 1) + " отправлена");
                                 System.out.println(fm.getPartNumber());
                             }
                             in.close();
@@ -55,32 +57,33 @@ public class RequestHandler extends ChannelInboundHandlerAdapter {
                         }
                     } catch (IOException e) {
                         LOGGER.error("Сбой при отправке файла клиентом", e);
-                        throw new RuntimeException("SWW", e);
+                        throw new RuntimeException("Что-то пошло не так...", e);
                     }
                     break;
-                case "/ls":
-                    LOGGER.debug("Получена комманда /la (список файлов) от клиента");
+                case LIST:
+                    LOGGER.debug("Получена комманда LIST (список файлов) от клиента");
                     List<String> files = new ArrayList<>();
                     Files.walkFileTree(Paths.get("./project/server_dir/" + request.getLogin()),
-                            new SimpleFileVisitor<Path>() {
+                            new SimpleFileVisitor<>() {
                                 @Override
                                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                                     files.add(file.getFileName().toString());
                                     return FileVisitResult.CONTINUE;
                                 }
+
                             });
-                    DirectoryListInfo dim = new DirectoryListInfo(files);
+                    DirectoryInfo dim = new DirectoryInfo(files);
                     ctx.writeAndFlush(dim);
                     break;
-                case "/rm":
-                    LOGGER.debug("Получена комманда /rm (удаление) от клиента");
+                case REMOVE:
+                    LOGGER.debug("Получена комманда REMOVE (удаление) от клиента");
                     Path removeDir = Paths.get("./project/server_dir/" + request.getLogin() + "/" + request.getFilename());
                     if (Files.exists(removeDir)) {
                         removeDir.toFile().delete();
                     }
                     break;
-                case "/mv":
-                    LOGGER.debug("Получена комманда /mw (переименование) от клиента");
+                case RENAME:
+                    LOGGER.debug("Получена комманда RENAME (переименование) от клиента");
                     Path renameDir = Paths.get("./project/server_dir/" + request.getLogin() + "/" + request.getFilename());
                     Path newDir = Paths.get("./project/server_dir/" + request.getLogin() + "/" + request.getNewFileName());
                     if (Files.exists(renameDir)) {
